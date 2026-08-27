@@ -263,34 +263,63 @@ function show(id){
 
 }
 
-function agendar(){
+async function agendar(){
 
-  const service=document.getElementById('service').value;
-  const date=document.getElementById('date').value;
-  const time=document.getElementById('time').value;
-  const name=document.getElementById('name').value;
-  const phone=document.getElementById('phone').value;
+  const service = document.getElementById('service').value;
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
 
   if(!service || !date || !time || !name || !phone){
-
     alert('Por favor, preencha todos os campos.');
     return;
-
   }
 
-  const selectedDate=new Date(date+'T12:00:00');
-  const day=selectedDate.getDay();
+  const selectedDate = new Date(date + 'T12:00:00');
+  const day = selectedDate.getDay();
 
-  if(day===0){
-
+  if(day === 0){
     alert('A Joyce não atende aos domingos. Escolha outro dia.');
     return;
-
   }
 
-  const formattedDate=selectedDate.toLocaleDateString('pt-BR');
+  const formattedDate = selectedDate.toLocaleDateString('pt-BR');
 
-  const message=
+  const { data: cliente, error: clienteError } =
+    await supabaseClient
+      .from('clientes')
+      .insert({
+        nome: name,
+        telefone: phone
+      })
+      .select()
+      .single();
+
+  if(clienteError){
+    alert('Não foi possível salvar os dados da cliente.');
+    console.error(clienteError);
+    return;
+  }
+
+  const { error: agendamentoError } =
+    await supabaseClient
+      .from('agendamentos')
+      .insert({
+        cliente_id: cliente.id,
+        servico: service,
+        data: date,
+        horario: time,
+        status: 'A confirmar'
+      });
+
+  if(agendamentoError){
+    alert('Não foi possível salvar o agendamento.');
+    console.error(agendamentoError);
+    return;
+  }
+
+  const message =
 `Olá Joyce! 💕 Quero solicitar um agendamento.
 
 Nome: ${name}
@@ -301,31 +330,29 @@ Horário: ${time}
 
 Estou ciente da caução de €10 para confirmação do horário.`;
 
-  const whatsappNumber='351927152122';
+  const whatsappNumber = '351927152122';
 
-  const whatsappURL=
-  'https://wa.me/'+whatsappNumber+
-  '?text='+encodeURIComponent(message);
+  const whatsappURL =
+    'https://wa.me/' + whatsappNumber +
+    '?text=' + encodeURIComponent(message);
 
-  document.getElementById('resultado').classList.remove('hidden');
+  const resultado = document.getElementById('resultado');
 
-  document.getElementById('resultado').innerHTML=
-  'Pedido preparado! Clique abaixo para enviar pelo WhatsApp.';
+  resultado.classList.remove('hidden');
 
-  const button=document.createElement('button');
+  resultado.innerHTML =
+    '✅ Pedido salvo com sucesso! Agora envie a solicitação pelo WhatsApp.';
 
-  button.innerText='📲 Enviar pedido pelo WhatsApp';
+  const button = document.createElement('button');
 
-  button.onclick=function(){
+  button.innerText = '📲 Enviar pedido pelo WhatsApp';
 
-    window.open(whatsappURL,'_blank');
-
+  button.onclick = function(){
+    window.open(whatsappURL, '_blank');
   };
 
-  document.getElementById('resultado').appendChild(button);
-
+  resultado.appendChild(button);
 }
-
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
