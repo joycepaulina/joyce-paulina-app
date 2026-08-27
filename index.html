@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -121,6 +122,7 @@ input,select{
   font-size:13px
 }
 </style>
+
 </head>
 
 <body>
@@ -144,39 +146,17 @@ input,select{
     Escolha o serviço, dia e horário para solicitar seu agendamento.
   </div>
 
-  <label>Serviço</label>
-  <select id="service">
-    <option value="">Selecione o serviço</option>
-    <option>Fio a Fio — 1h30</option>
-    <option>Volume Brasileiro — 1h30</option>
-    <option>Efeito Rímel — 1h30</option>
-    <option>Volume Russo — 1h30</option>
-    <option>Maquiagem — 1h</option>
-    <option>Design de sobrancelhas — 40 min</option>
-    <option>Design + Henna — 1h</option>
-    <option>Dermaplaning — 1h</option>
-  </select>
+<label>Serviço</label> <select id="service"> <option value="">Selecione o serviço</option> <option>Fio a Fio — 1h30</option> <option>Volume Brasileiro — 1h30</option> <option>Efeito Rímel — 1h30</option> <option>Volume Russo — 1h30</option> <option>Maquiagem — 1h</option> <option>Design de sobrancelhas — 40 min</option> <option>Design + Henna — 1h</option> <option>Dermaplaning — 1h</option> </select>
 
-  <label>Data</label>
-  <input type="date" id="date">
+<label>Data</label> <input type="date" id="date">
 
-  <label>Horário</label>
-  <select id="time">
-    <option value="">Selecione o horário</option>
-    <option>10:00</option>
-    <option>11:30</option>
-    <option>14:00</option>
-    <option>16:00</option>
-    <option>18:00</option>
-  </select>
+<label>Horário</label> <select id="time"> <option value="">Selecione o horário</option> <option>10:00</option> <option>11:30</option> <option>14:00</option> <option>16:00</option> <option>18:00</option> </select>
 
-  <label>Seu nome</label>
-  <input type="text" id="name" placeholder="Digite seu nome">
+<label>Seu nome</label> <input type="text" id="name" placeholder="Digite seu nome">
 
-  <label>Seu telefone</label>
-  <input type="tel" id="phone" placeholder="Seu contacto">
+<label>Seu telefone</label> <input type="tel" id="phone" placeholder="Seu contacto">
 
-  <button onclick="agendar()">Confirmar agendamento</button>
+<button onclick="agendar()">Confirmar agendamento</button>
 
   <div id="resultado" class="success hidden"></div>
 
@@ -261,75 +241,36 @@ function show(id){
 
   document.getElementById('admin').classList.toggle('hidden',id!=='admin');
 
-}<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+}
 
-<script>
-const SUPABASE_URL = "https://rhcjcbmvgkfisdxjpvqt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_lMWTJJV4NQa85xrwsWj30g_BR4NfR2U
+function agendar(){
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-</script>
-
-async function agendar(){
-
-  const service = document.getElementById('service').value;
-  const date = document.getElementById('date').value;
-  const time = document.getElementById('time').value;
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
+  const service=document.getElementById('service').value;
+  const date=document.getElementById('date').value;
+  const time=document.getElementById('time').value;
+  const name=document.getElementById('name').value;
+  const phone=document.getElementById('phone').value;
 
   if(!service || !date || !time || !name || !phone){
+
     alert('Por favor, preencha todos os campos.');
     return;
+
   }
 
-  const selectedDate = new Date(date + 'T12:00:00');
-  const day = selectedDate.getDay();
+  const selectedDate=new Date(date+'T12:00:00');
+  const day=selectedDate.getDay();
 
-  if(day === 0){
+  if(day===0){
+
     alert('A Joyce não atende aos domingos. Escolha outro dia.');
     return;
+
   }
 
-  const formattedDate = selectedDate.toLocaleDateString('pt-BR');
+  const formattedDate=selectedDate.toLocaleDateString('pt-BR');
 
-  const { data: cliente, error: clienteError } =
-    await supabaseClient
-      .from('clientes')
-      .insert({
-        nome: name,
-        telefone: phone
-      })
-      .select()
-      .single();
-
-  if(clienteError){
-    alert('Não foi possível salvar os dados da cliente.');
-    console.error(clienteError);
-    return;
-  }
-
-  const { error: agendamentoError } =
-    await supabaseClient
-      .from('agendamentos')
-      .insert({
-        cliente_id: cliente.id,
-        servico: service,
-        data: date,
-        horario: time,
-        status: 'A confirmar'
-      });
-
-  if(agendamentoError){
-    alert('Não foi possível salvar o agendamento.');
-    console.error(agendamentoError);
-    return;
-  }
-
-  const message =
+  const message=
 `Olá Joyce! 💕 Quero solicitar um agendamento.
 
 Nome: ${name}
@@ -340,38 +281,32 @@ Horário: ${time}
 
 Estou ciente da caução de €10 para confirmação do horário.`;
 
-  const whatsappNumber = '351927152122';
+  const whatsappNumber='351927152122';
 
-  const whatsappURL =
-    'https://wa.me/' + whatsappNumber +
-    '?text=' + encodeURIComponent(message);
+  const whatsappURL=
+  'https://wa.me/'+whatsappNumber+
+  '?text='+encodeURIComponent(message);
 
-  const resultado = document.getElementById('resultado');
+  document.getElementById('resultado').classList.remove('hidden');
 
-  resultado.classList.remove('hidden');
+  document.getElementById('resultado').innerHTML=
+  'Pedido preparado! Clique abaixo para enviar pelo WhatsApp.';
 
-  resultado.innerHTML =
-    '✅ Pedido salvo com sucesso! Agora envie a solicitação pelo WhatsApp.';
+  const button=document.createElement('button');
 
-  const button = document.createElement('button');
+  button.innerText='📲 Enviar pedido pelo WhatsApp';
 
-  button.innerText = '📲 Enviar pedido pelo WhatsApp';
+  button.onclick=function(){
 
-  button.onclick = function(){
-    window.open(whatsappURL, '_blank');
+    window.open(whatsappURL,'_blank');
+
   };
 
-  resultado.appendChild(button);
-}
-</script>
-const SUPABASE_URL = "https://rhcjcbmvgkfisdxjpvqt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_lMWTJJV4NQa85xrwsWj30g_BR4NfR2U
+  document.getElementById('resultado').appendChild(button);
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-);
+}
+
 </script>
+
 </body>
 </html>
