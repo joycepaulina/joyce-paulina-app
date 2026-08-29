@@ -232,8 +232,17 @@ input,select{
 </nav>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+const SUPABASE_URL = "https://rhcjcbmvgkfisdxjpvqt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_lMWTJJV4NQa85xrwsWj30g_BR4NfR2U";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
 
 function show(id){
 
