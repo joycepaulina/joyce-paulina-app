@@ -345,72 +345,7 @@ Estou ciente da caução de €10 para confirmação do horário.`;
 
   resultado.appendChild(button);
 }
-  async function carregarAgenda(){
 
-  const lista = document.getElementById('agendaLista');
-
-  lista.innerHTML = '<div class="small">Carregando agendamentos...</div>';
-
-  const { data, error } = await supabaseClient
-    .from('agendamentos')
-    .select(`
-      id,
-      servico,
-      data,
-      horario,
-      status,
-      clientes (
-        nome,
-        telefone
-      )
-    `)
-    .order('data', { ascending: true })
-    .order('horario', { ascending: true });
-
-  if(error){
-    console.error(error);
-    lista.innerHTML =
-      '<div class="small">Não foi possível carregar a agenda.</div>';
-    return;
-  }
-
-  if(!data || data.length === 0){
-    lista.innerHTML =
-      '<div class="small">Nenhum agendamento encontrado.</div>';
-    return;
-  }
-
-  lista.innerHTML = '';
-
-  data.forEach(agendamento => {
-
-    const cliente = agendamento.clientes;
-
-    const item = document.createElement('div');
-
-    item.className = 'row';
-
-    item.innerHTML = `
-      <div>
-        <strong>${cliente?.nome || 'Cliente'}</strong>
-        <div class="small">
-          ${agendamento.data} • ${agendamento.horario}
-        </div>
-        <div class="small">
-          ${agendamento.servico}
-        </div>
-      </div>
-
-      <div class="pill">
-        ${agendamento.status}
-      </div>
-    `;
-
-    lista.appendChild(item);
-
-  });
-
-}
 </script>
 
 </body>
