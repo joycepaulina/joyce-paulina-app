@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -75,6 +76,11 @@ input,select{
   color:var(--ink);
   font-size:14px
 }
+.outline{
+  background:#fff;
+  color:var(--rose);
+  border:1px solid #d9bec7
+}
 .row{
   display:flex;
   justify-content:space-between;
@@ -82,6 +88,12 @@ input,select{
   padding:12px 0;
   border-bottom:1px solid #eee;
   align-items:center
+}
+.pill{
+  background:#f2e5e8;
+  padding:6px 9px;
+  border-radius:20px;
+  font-size:11px
 }
 .section{font-weight:800;margin:18px 0 10px}
 .nav{
@@ -100,6 +112,7 @@ input,select{
   margin:0;
   padding:5px
 }
+.nav .active{color:var(--rose)}
 .hidden{display:none}
 .success{
   background:#f1e7e9;
@@ -109,6 +122,7 @@ input,select{
   font-size:13px
 }
 </style>
+
 </head>
 
 <body>
@@ -126,47 +140,23 @@ input,select{
 <div class="grid">
 
 <div class="card wide">
-
   <div class="icon">📅</div>
   <div class="title">Agendar horário</div>
-
   <div class="small">
     Escolha o serviço, dia e horário para solicitar seu agendamento.
   </div>
 
-  <label>Serviço</label>
-  <select id="service">
-    <option value="">Selecione o serviço</option>
-    <option>Fio a Fio — 1h30</option>
-    <option>Volume Brasileiro — 1h30</option>
-    <option>Efeito Rímel — 1h30</option>
-    <option>Volume Russo — 1h30</option>
-    <option>Maquiagem — 1h</option>
-    <option>Design de sobrancelhas — 40 min</option>
-    <option>Design + Henna — 1h</option>
-    <option>Dermaplaning — 1h</option>
-  </select>
+<label>Serviço</label> <select id="service"> <option value="">Selecione o serviço</option> <option>Fio a Fio — 1h30</option> <option>Volume Brasileiro — 1h30</option> <option>Efeito Rímel — 1h30</option> <option>Volume Russo — 1h30</option> <option>Maquiagem — 1h</option> <option>Design de sobrancelhas — 40 min</option> <option>Design + Henna — 1h</option> <option>Dermaplaning — 1h</option> </select>
 
-  <label>Data</label>
-  <input type="date" id="date">
+<label>Data</label> <input type="date" id="date">
 
-  <label>Horário</label>
-  <select id="time">
-    <option value="">Selecione o horário</option>
-    <option>10:00</option>
-    <option>11:30</option>
-    <option>14:00</option>
-    <option>16:00</option>
-    <option>18:00</option>
-  </select>
+<label>Horário</label> <select id="time"> <option value="">Selecione o horário</option> <option>10:00</option> <option>11:30</option> <option>14:00</option> <option>16:00</option> <option>18:00</option> </select>
 
-  <label>Seu nome</label>
-  <input type="text" id="name" placeholder="Digite seu nome">
+<label>Seu nome</label> <input type="text" id="name" placeholder="Digite seu nome">
 
-  <label>Seu telefone</label>
-  <input type="tel" id="phone" placeholder="Seu contacto">
+<label>Seu telefone</label> <input type="tel" id="phone" placeholder="Seu contacto">
 
-  <button onclick="testeBotao()">Confirmar agendamento</button>
+<button onclick="agendar()">Confirmar agendamento</button>
 
   <div id="resultado" class="success hidden"></div>
 
@@ -242,7 +232,6 @@ input,select{
 </nav>
 
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -253,26 +242,79 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+</script>
 
 function show(id){
 
-  document.getElementById('client').classList.toggle(
-    'hidden',
-    id !== 'client'
-  );
+  document.getElementById('client').classList.toggle('hidden',id!=='client');
 
-  document.getElementById('admin').classList.toggle(
-    'hidden',
-    id !== 'admin'
-  );
+  document.getElementById('admin').classList.toggle('hidden',id!=='admin');
 
 }
 
-function testeBotao(){
+function agendar(){
 
-  alert('TESTE OK');
+  const service=document.getElementById('service').value;
+  const date=document.getElementById('date').value;
+  const time=document.getElementById('time').value;
+  const name=document.getElementById('name').value;
+  const phone=document.getElementById('phone').value;
+
+  if(!service || !date || !time || !name || !phone){
+
+    alert('Por favor, preencha todos os campos.');
+    return;
+
+  }
+
+  const selectedDate=new Date(date+'T12:00:00');
+  const day=selectedDate.getDay();
+
+  if(day===0){
+
+    alert('A Joyce não atende aos domingos. Escolha outro dia.');
+    return;
+
+  }
+
+  const formattedDate=selectedDate.toLocaleDateString('pt-BR');
+
+  const message=
+`Olá Joyce! 💕 Quero solicitar um agendamento.
+
+Nome: ${name}
+Contacto: ${phone}
+Serviço: ${service}
+Data: ${formattedDate}
+Horário: ${time}
+
+Estou ciente da caução de €10 para confirmação do horário.`;
+
+  const whatsappNumber='351927152122';
+
+  const whatsappURL=
+  'https://wa.me/'+whatsappNumber+
+  '?text='+encodeURIComponent(message);
+
+  document.getElementById('resultado').classList.remove('hidden');
+
+  document.getElementById('resultado').innerHTML=
+  'Pedido preparado! Clique abaixo para enviar pelo WhatsApp.';
+
+  const button=document.createElement('button');
+
+  button.innerText='📲 Enviar pedido pelo WhatsApp';
+
+  button.onclick=function(){
+
+    window.open(whatsappURL,'_blank');
+
+  };
+
+  document.getElementById('resultado').appendChild(button);
 
 }
+
 </script>
 
 </body>
